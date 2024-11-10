@@ -24,7 +24,11 @@ jobs:
     environment: staging
 
     permissions:
+      # For pushing to GHCR
       packages: write
+      # For attestation step
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
