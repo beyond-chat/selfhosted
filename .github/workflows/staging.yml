@@ -10,10 +10,10 @@ env:
 
 jobs:
   axum-api:
-    uses: ./.github/reusable-workflows/axum-api.yml
+    uses: ./.github/workflows/axum-api.yml
 
   svelte-ui:
-    uses: ./.github/reusable-workflows/svelte-ui.yml
+    uses: ./.github/workflows/svelte-ui.yml
 
   build:
     needs:
