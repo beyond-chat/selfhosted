@@ -45,7 +45,7 @@ function setCookies(cookies: Cookies, cookieName: string, cookieValue: string) {
 	cookies.set(cookieName, cookieValue, {
 		path: '/',
 		httpOnly: true,
-		secure: !dev,
+		secure: false,
 		sameSite: 'strict'
 	});
 }
