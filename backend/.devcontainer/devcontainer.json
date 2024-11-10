@@ -1,0 +1,30 @@
+{
+	"name": "axum_api-bc_sh",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "."
+	},
+	"runArgs": [
+		"--env-file=.env",
+		"--network=host"
+	],
+	"containerEnv": {
+		"TZ": "America/Vancouver"
+	},
+	"postCreateCommand": ".devcontainer/postCreateCommand.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"fill-labs.dependi"
+			]
+		}
+	},
+	"shutdownAction": "stopContainer",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		}
+	}
+}
