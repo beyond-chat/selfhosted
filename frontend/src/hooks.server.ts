@@ -83,6 +83,7 @@ function setCookies(event: RequestEvent, cookieName: string, cookieValue: string
 	event.cookies.set(cookieName, cookieValue, {
 		path: '/',
 		httpOnly: true,
+		// secure: !dev,
 		secure: false,
 		sameSite: 'strict'
 	});
