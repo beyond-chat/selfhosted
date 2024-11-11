@@ -57,6 +57,16 @@ export const load: LayoutServerLoad = async ({ cookies, fetch }) => {
 	llmSavedSettings.llmApiModels = await res_llmApiModels.json();
 	llmSavedSettings.promptConfigs = await res_promptConfigs.json();
 	llmSavedSettings.favModels = await res_favModels.json();
+	if (llmSavedSettings.favModels.length === 0) {
+		llmSavedSettings.favModels = [
+			{
+				id: 0,
+				api_id: 0,
+				model: '',
+				prompt_id: 0
+			}
+		]
+	}
 
 	return { chats, llmSavedSettings };
 };

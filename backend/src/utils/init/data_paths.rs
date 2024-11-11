@@ -1,8 +1,5 @@
 use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
 use std::{io::Write, sync::OnceLock};
-
-use crate::models::llm::FavModel;
 pub static TOML_CONFIG_PATHS: OnceLock<Paths> = OnceLock::new();
 
 #[derive(Debug)]
@@ -22,24 +19,11 @@ pub struct Llm {
     pub prompt_engineering: String,
     pub selected_model_and_prompt: String,
 }
-#[derive(Serialize, Deserialize)]
-struct FavModelConfigs {
-    configs: Vec<FavModel>, // configs name need to match the toml array name
-}
+
 pub fn set_toml_paths_fn() -> Result<()> {
     let config = Config {
             password_hash: create_toml("/app/.data/config/admin-user/pass.toml", Some("password_hash = \"$argon2id$v=19$m=19456,t=2,p=1$rcqhKow+Gkq2C1CQMRjdBA$iVoDKImduIYsD3XcaAIMvKeM0JYl9yEaLcx844A7ESg\""))?,
         };
-    let default_model = FavModelConfigs {
-        configs: vec![FavModel {
-            id: 0,
-            api_id: 0,
-            model: "gpt-3.5-turbo".to_string(),
-            prompt_id: 0,
-        }],
-    };
-    let deault_model_content =
-        toml::to_string(&default_model).context("Failed to parse default fav model to toml")?;
     let llm = Llm {
         api_and_models_config: create_toml(
             "/app/.data/llm/api_and_models-config.toml",
@@ -51,7 +35,7 @@ pub fn set_toml_paths_fn() -> Result<()> {
         )?,
         selected_model_and_prompt: create_toml(
             "/app/.data/llm/fav-models.toml",
-            Some(&deault_model_content),
+            Some("configs = []"),
         )?,
     };
     TOML_CONFIG_PATHS.set(Paths { config, llm }).unwrap();
