@@ -34,10 +34,10 @@ export const actions = {
 		}
 	},
 	logout: async ({ cookies }) => {
-		cookies.delete('refresh_token');
-		cookies.delete('refresh_token_expiration');
-		cookies.delete('access_token');
-		cookies.delete('access_token_expiration');
+		deleteCookies(cookies, 'refresh_token');
+		deleteCookies(cookies, 'refresh_token_expiration');
+		deleteCookies(cookies, 'access_token');
+		deleteCookies(cookies, 'access_token_expiration');
 		return redirect(303, '/auth');
 	}
 };
@@ -48,4 +48,7 @@ function setCookies(cookies: Cookies, cookieName: string, cookieValue: string) {
 		secure: false,
 		sameSite: 'strict'
 	});
+}
+function deleteCookies(cookies: Cookies, cookieName: string) {
+	cookies.delete(cookieName, { path: '/', httpOnly: true, secure: false, sameSite: 'strict' });
 }
