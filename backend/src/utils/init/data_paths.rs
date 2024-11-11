@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use std::{io::Write, sync::OnceLock};
+
 pub static TOML_CONFIG_PATHS: OnceLock<Paths> = OnceLock::new();
 
 #[derive(Debug)]
@@ -34,8 +35,8 @@ pub fn set_toml_paths_fn() -> Result<()> {
             Some("configs = []"),
         )?,
         selected_model_and_prompt: create_toml(
-            "/app/.data/llm/selected-model-and-prompt.toml",
-            Some("configs = []"),
+            "/app/.data/llm/fav-models.toml",
+            Some("[configs]\n[[configs]]\nid = 0\napi_id = 0\nmodel = \"gpt-3.5-turbo\"\nprompt_id = 0"),
         )?,
     };
     TOML_CONFIG_PATHS.set(Paths { config, llm }).unwrap();

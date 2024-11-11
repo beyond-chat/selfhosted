@@ -1,20 +1,13 @@
 use std::ops::Deref;
 
 use crate::{
-    models::llm::{ApiAndModelsConfig, PromptConfig},
+    models::llm::{ApiAndModelsConfig, FavModel, PromptConfig},
     utils::init::TOML_PATHS,
     Context, Result,
 };
 use axum::{http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
-pub struct FavModel {
-    id: u32,
-    api_id: u32,
-    model: String,
-    prompt_id: u32,
-}
 #[derive(Serialize, Deserialize)]
 struct Configs {
     configs: Vec<FavModel>, // configs name need to match the toml array name

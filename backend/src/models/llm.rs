@@ -1,6 +1,14 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub struct FavModel {
+    pub id: u32,
+    pub api_id: u32,
+    pub model: String,
+    pub prompt_id: u32,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct PromptConfig {
     pub id: u32,
     pub name: String,
