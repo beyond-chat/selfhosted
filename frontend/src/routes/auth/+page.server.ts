@@ -34,10 +34,10 @@ export const actions = {
 		}
 	},
 	logout: async ({ cookies }) => {
-		cookies.delete('refresh_token', { path: '/' });
-		cookies.delete('refresh_token_expiration', { path: '/' });
-		cookies.delete('access_token', { path: '/' });
-		cookies.delete('access_token_expiration', { path: '/' });
+		cookies.delete('refresh_token');
+		cookies.delete('refresh_token_expiration');
+		cookies.delete('access_token');
+		cookies.delete('access_token_expiration');
 		return redirect(303, '/auth');
 	}
 };
