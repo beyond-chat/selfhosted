@@ -16,7 +16,7 @@ impl JWT {
     pub fn encode(self, sub: String) -> Result<(String, usize)> {
         let env_vars = ENV_VARS.get().unwrap();
         let secret = &env_vars.jwt_secret;
-        
+
         let now = chrono::Utc::now();
         let exp = match self {
             Self::AccessToken => (now + chrono::Duration::hours(1)).timestamp() as usize,
