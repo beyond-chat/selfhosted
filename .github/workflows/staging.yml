@@ -17,7 +17,6 @@ jobs:
   build:
     needs:
       - axum-api
-      
       - svelte-ui
     runs-on: ubuntu-22.04
 
