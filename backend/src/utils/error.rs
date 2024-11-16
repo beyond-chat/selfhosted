@@ -33,18 +33,13 @@ pub enum Error {
     /// Similarly, we don't want to report random `anyhow` errors to the user.
     #[error("an internal server error occurred")]
     Anyhow(#[from] anyhow::Error),
-
-    #[error("OpenAI error occurred: {0}")]
-    OpenAI(#[from] async_openai::error::OpenAIError),
 }
 impl Error {
     // Determine the appropriate status code.
     pub fn status_code(&self) -> StatusCode {
         match self {
             Error::InvalidJsonBody(_) | Error::InvalidRequest(_) => StatusCode::BAD_REQUEST,
-            Error::Sqlx(_) | Error::Anyhow(_) | Error::OpenAI(_) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            Error::Sqlx(_) | Error::Anyhow(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Unauthorized => StatusCode::UNAUTHORIZED,
         }
     }
@@ -76,7 +71,6 @@ impl IntoResponse for Error {
             Error::InvalidRequest(_) => format!("{}", self),
             Error::Sqlx(ref err) => format!("{}", err),
             Error::Anyhow(ref err) => format!("{}", err),
-            Error::OpenAI(ref err) => format!("{}", err),
         };
         error!("{}", error_to_log);
 

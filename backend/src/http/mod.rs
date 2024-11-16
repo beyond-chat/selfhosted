@@ -4,7 +4,7 @@ use axum::{middleware::from_fn, Router};
 use sqlx::PgPool;
 use tower::ServiceBuilder;
 
-mod layers;
+use middleware::layers;
 pub mod middleware;
 use crate::{models::cache::CacheState, routes, utils::telemetry};
 
@@ -34,7 +34,7 @@ pub async fn serve(pg_pool: PgPool) {
                 .layer(telemetry::http_trace_layer())
                 .layer(layers::propagate_request_id())
                 .layer(layers::timeout())
-                .layer(middleware::cors())
+                .layer(layers::cors())
                 .layer(layers::normalize_path())
                 .layer(from_fn(middleware::auth)),
         );

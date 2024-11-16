@@ -1,30 +1,34 @@
-type PromptConfig = {
-	id?: number;
-	name: string;
-	max_tokens: number;
-	temperature: number;
-	system_prompt: string;
-};
+import { LlmSdk } from '../../routes/(signedInUser)/llmSettings/state.svelte';
 
-type LlmSdk = 'OpenAI' | 'Anthropic';
-type LLMApiConfig = {
-	id?: number;
-	name: string;
-	endpoint_sdk: LlmSdk;
-	api_key?: string;
-	base_url: string;
-	models: string[];
-};
+declare global {
+	interface PromptConfig {
+		id?: number;
+		name: string;
+		max_tokens: number;
+		temperature: number;
+		system_prompt: string;
+	}
 
-type FavModel = {
-	id: number;
-	api_id: number;
-	model: string;
-	prompt_id: number;
-};
+	// type LlmSdk = 'OpenAI' | 'Anthropic' | 'Together';
+	interface ApiConfig {
+		id: number | '';
+		name: string;
+		endpoint_sdk: LlmSdk;
+		secret_key?: string;
+		base_url?: string;
+		models?: string[];
+	}
 
-type LLMSavedSettings = {
-	llmApiModels: LLMApiConfig[];
-	promptConfigs: PromptConfig[];
-	favModels: FavModel[];
-};
+	interface FavModel {
+		id: number;
+		api: ApiConfig;
+		model: string;
+		prompt: PromptConfig;
+	}
+
+	interface LLMSettings {
+		apiConfigs: ApiConfig[];
+		promptConfigs: PromptConfig[];
+		favModels: FavModel[];
+	}
+}

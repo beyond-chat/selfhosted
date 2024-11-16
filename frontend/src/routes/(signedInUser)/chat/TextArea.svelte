@@ -6,11 +6,10 @@
 	import IcBaselineStopCircle from '~icons/ic/baseline-stop-circle';
 	import FluentSettingsChat16Filled from '~icons/fluent/settings-chat-16-filled';
 
-	let { llmSavedSettings }: { llmSavedSettings: LLMSavedSettings } = $props();
-
 	import { submitQuery, textArea } from './textArea.svelte';
 	import { esClose_SaveDb } from './[chatId]/chatResponse';
-	import { chatState } from './[chatId]/chat.svelte';
+	import { chatState } from './[chatId]/state.svelte';
+	import { llmState } from '../llmSettings/state.svelte';
 
 	let chatId = $derived($page.url.pathname.split('/').pop());
 	let isSendButtonDisabled = $derived(textArea.value.trim() === '');
@@ -33,23 +32,6 @@
 		event.preventDefault();
 		esClose_SaveDb(chatId);
 	}
-
-	let selectedFav = $derived.by(() => {
-		const favModel = llmSavedSettings.favModels.find((model) => model.id === textArea.activeFav);
-		if (favModel) {
-			return {
-				api: llmSavedSettings.llmApiModels.find((api) => api.id === favModel.api_id),
-				model: favModel.model,
-				prompt: llmSavedSettings.promptConfigs.find((prompt) => prompt.id === favModel.prompt_id)
-			};
-		} else {
-			return {
-				api: undefined,
-				model: undefined,
-				prompt: undefined
-			};
-		}
-	});
 </script>
 
 <div class="flex flex-col">
@@ -90,16 +72,16 @@
 	>
 		<!-- Show Api Name and Model by getting from Id -->
 		<div class="flex max-w-[47%] items-center gap-2 truncate">
-			<span>API: {selectedFav.api?.name}</span>
-			<span>Model: {selectedFav.model}</span>
+			<span>API: {llmState.activeFav?.api.name}</span>
+			<span>Model: {llmState.activeFav?.model}</span>
 		</div>
 
 		<div class="mx-1">
 			<FluentSettingsChat16Filled class="h-[14px] w-[14px] text-accent text-opacity-70" />
 		</div>
 		<div class="flex max-w-[47%] items-center gap-2 truncate">
-			<span>Max Tokens: {selectedFav.prompt?.max_tokens}</span>
-			<span>Temp: {selectedFav.prompt?.temperature}</span>
+			<span>Max Tokens: {llmState.activeFav?.prompt.max_tokens}</span>
+			<span>Temp: {llmState.activeFav?.prompt.temperature}</span>
 		</div>
 	</div>
 </div>

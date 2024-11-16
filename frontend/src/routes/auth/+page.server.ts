@@ -1,5 +1,4 @@
 import { redirect, type Cookies } from '@sveltejs/kit';
-import { dev } from '$app/environment';
 
 import type { PageServerLoad } from './$types';
 

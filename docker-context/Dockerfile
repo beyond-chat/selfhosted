@@ -24,5 +24,8 @@ COPY ./docker-context/nginx.conf /etc/nginx/nginx.conf
 # Copy supervisord config
 COPY ./docker-context/supervisord.conf /etc/supervisord.conf
 
+ENV DATABASE_POOL_MAX_SIZE=5
+ENV JWT_SECRET="mysecretjwt"
+
 # Start supervisord
 ENTRYPOINT ["/etc/app/init.sh"]

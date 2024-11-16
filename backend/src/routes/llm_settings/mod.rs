@@ -1,6 +1,7 @@
 use axum::{routing::get, Router};
 
 mod api_configs;
+mod fav_model;
 mod fav_models;
 mod prompt_engineering;
 pub use fav_models::get_selected_fn;
@@ -21,6 +22,7 @@ pub fn router() -> Router {
                 .delete(api_configs::delete_config)
                 .patch(api_configs::update_config),
         )
+        .route("/fav-model/:id", get(fav_model::get_handler))
         .route(
             "/fav-models",
             get(fav_models::get_handler).put(fav_models::update_handler),

@@ -17,11 +17,6 @@
 			<li>
 				<a href="/profile/password"> Profile </a>
 			</li>
-			<!-- <li>
-        <a href="/llmSettings/prompt" class="justify-between"
-          >Settings
-          <span class="badge">API</span></a>
-      </li> -->
 			<form method="POST" action="/auth?/logout">
 				<li>
 					<button type="submit">Logout</button>

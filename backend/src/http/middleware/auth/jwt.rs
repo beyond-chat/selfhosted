@@ -1,4 +1,4 @@
-use crate::{Error, Result};
+use crate::{utils::init::ENV_VARS, Error, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -14,8 +14,9 @@ pub enum JWT {
 }
 impl JWT {
     pub fn encode(self, sub: String) -> Result<(String, usize)> {
-        // let secret = std::env::var("JWT_SECRET")?;
-        let secret = "secret";
+        let env_vars = ENV_VARS.get().unwrap();
+        let secret = &env_vars.jwt_secret;
+        
         let now = chrono::Utc::now();
         let exp = match self {
             Self::AccessToken => (now + chrono::Duration::hours(1)).timestamp() as usize,
@@ -30,17 +31,18 @@ impl JWT {
         let token = jsonwebtoken::encode(
             &jsonwebtoken::Header::default(),
             &claims,
-            &jsonwebtoken::EncodingKey::from_secret(secret.as_ref()),
+            &jsonwebtoken::EncodingKey::from_secret(secret.as_bytes()),
         )
         .map_err(|e| anyhow::anyhow!("failed to encode JWT: {}", e))?;
         Ok((token, exp))
     }
     pub fn decode(token: String) -> Result<String> {
-        let secret = "secret";
+        let env_vars = ENV_VARS.get().unwrap();
+        let secret = &env_vars.jwt_secret;
 
         let token_data = jsonwebtoken::decode::<Claims>(
             &token,
-            &jsonwebtoken::DecodingKey::from_secret(secret.as_ref()),
+            &jsonwebtoken::DecodingKey::from_secret(secret.as_bytes()),
             &jsonwebtoken::Validation::default(),
         )
         .map_err(|e| anyhow::anyhow!("failed to decode JWT: {}", e))?;

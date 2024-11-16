@@ -1,7 +1,6 @@
-import { sidebar } from '$/components/layout/sidebar.svelte';
+import { sidebarState } from '$/components/layout/sidebar.svelte';
 import { goto } from '$app/navigation';
-import type { HistoryChatDetails } from '$lib/types/chat';
-import { chatState } from '../../../routes/(signedInUser)/chat/[chatId]/chat.svelte';
+import { chatState } from './[chatId]/state.svelte';
 
 export const actions = {
 	deleteChat: async (chatId: string) => {
@@ -14,12 +13,12 @@ export const actions = {
 		});
 		if (res.ok) {
 			if (chatState.starred) {
-				const chatIndex = sidebar.chatHistory.starred_history.findIndex(
+				const chatIndex = sidebarState.chatHistory.starred_history.findIndex(
 					(chat) => chat.id === chatId
 				);
-				sidebar.chatHistory.starred_history.splice(chatIndex, 1);
+				sidebarState.chatHistory.starred_history.splice(chatIndex, 1);
 			} else {
-				for (const time_period of sidebar.chatHistory.unstarred_history) {
+				for (const time_period of sidebarState.chatHistory.unstarred_history) {
 					const chatIndex = time_period.period_chats.findIndex((chat) => chat.id === chatId);
 					if (chatIndex !== -1) {
 						time_period.period_chats.splice(chatIndex, 1);
@@ -44,12 +43,12 @@ export const actions = {
 		});
 		if (res.ok) {
 			if (chatState.starred) {
-				const chatIndex = sidebar.chatHistory.starred_history.findIndex(
+				const chatIndex = sidebarState.chatHistory.starred_history.findIndex(
 					(chat) => chat.id === chatId
 				);
-				sidebar.chatHistory.starred_history[chatIndex].title = title;
+				sidebarState.chatHistory.starred_history[chatIndex].title = title;
 			} else {
-				for (const time_period of sidebar.chatHistory.unstarred_history) {
+				for (const time_period of sidebarState.chatHistory.unstarred_history) {
 					const chatIndex = time_period.period_chats.findIndex((chat) => chat.id === chatId);
 					if (chatIndex !== -1) {
 						time_period.period_chats[chatIndex].title = title;
@@ -73,18 +72,20 @@ export const actions = {
 			chatState.starred = !chatState.starred;
 			if (chatState.starred) {
 				let currentChat: HistoryChatDetails | undefined = undefined;
-				for (const time_period of sidebar.chatHistory.unstarred_history) {
+				for (const time_period of sidebarState.chatHistory.unstarred_history) {
 					const chatIndex = time_period.period_chats.findIndex((chat) => chat.id === chatId);
 					if (chatIndex !== -1) {
 						currentChat = time_period.period_chats.splice(chatIndex, 1)[0];
 						break; // Exit the loop once the chat is found
 					}
 				}
-				sidebar.chatHistory.starred_history.unshift(currentChat!);
+				sidebarState.chatHistory.starred_history.unshift(currentChat!);
 			} else {
-				const index = sidebar.chatHistory.starred_history.findIndex((chat) => chat.id === chatId);
-				const currentChat = sidebar.chatHistory.starred_history.splice(index, 1)[0];
-				sidebar.addUnstarredChatToHistory(currentChat);
+				const index = sidebarState.chatHistory.starred_history.findIndex(
+					(chat) => chat.id === chatId
+				);
+				const currentChat = sidebarState.chatHistory.starred_history.splice(index, 1)[0];
+				sidebarState.addUnstarredChatToHistory(currentChat);
 			}
 		} else {
 			throw new Error(await res.text());

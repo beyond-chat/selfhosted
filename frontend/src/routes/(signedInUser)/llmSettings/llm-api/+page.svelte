@@ -1,20 +1,17 @@
 <!-- API/Models Page -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { LlmSdk, llmState } from '../state.svelte';
 
-	let { data } = $props();
-	let { llmSavedSettings }: { llmSavedSettings: LLMSavedSettings } = $derived(data);
-
-	const endpointSdkOptions: LlmSdk[] = ['OpenAI', 'Anthropic'];
-	let emptyConfig: LLMApiConfig = {
+	// const endpointSdkOptions: LlmSdk[] = ['OpenAI', 'Anthropic', 'OpenAI Compatible'];
+	let emptyConfig: ApiConfig = {
+		id: '',
 		name: '',
-		endpoint_sdk: endpointSdkOptions[0],
-		api_key: '',
-		base_url: '',
-		models: []
+		endpoint_sdk: LlmSdk.OpenAI,
+		base_url: ''
 	};
-	// let llmApiModels: LLMApiConfig[] = $state([])
-	let editingConfig: LLMApiConfig = $state(emptyConfig);
+	// let apiConfigs: ApiConfig[] = $state([])
+	let editingConfig: ApiConfig = $state(emptyConfig);
 	let apiEditModal: HTMLDialogElement;
 </script>
 
@@ -35,7 +32,7 @@
 			Add New API / Models
 		</button>
 	</div>
-	{#each llmSavedSettings.llmApiModels as config}
+	{#each llmState.settings.apiConfigs as config}
 		<div class="flex items-center justify-between border-b p-2 last:border-b-0">
 			<!-- last:border-b-0 to remove border from last element -->
 			<div class="flex-1">
@@ -43,7 +40,7 @@
 				<p class="text-sm text-gray-500">Base URL: {config.base_url}</p>
 				<h4 class="text-md font-semibold">Models:</h4>
 				<ul>
-					{#each config.models as model}
+					{#each config.models ?? [] as model}
 						<li class="text-sm text-gray-500">{model}</li>
 					{/each}
 				</ul>
@@ -72,7 +69,7 @@
 		<form method="POST" action="?/saveApiConfig" use:enhance onsubmit={() => apiEditModal.close()}>
 			<!-- Hidden Inputs to pass additional data -->
 			<input type="hidden" name="id" value={editingConfig.id} />
-			<input type="hidden" name="apiConfigsLength" value={llmSavedSettings.llmApiModels.length} />
+			<input type="hidden" name="apiConfigsLength" value={llmState.settings.apiConfigs.length} />
 
 			<!-- Endpoint SDK Dropdown  -->
 			<label class="flex items-center justify-end gap-2">
@@ -80,8 +77,10 @@
 					<span class="label-text">Endpoint Compatibility SDK:</span>
 				</div>
 				<select bind:value={editingConfig.endpoint_sdk} class="select select-bordered select-sm">
-					{#each endpointSdkOptions as sdk}
-						<option value={sdk}>{sdk}</option>
+					{#each Object.values(LlmSdk) as sdk}
+						<option value={sdk}
+							>{LlmSdk.OpenAICompatible === sdk ? 'OpenAI Compatible' : sdk}</option
+						>
 					{/each}
 				</select>
 				<input type="hidden" name="endpoint-sdk" value={editingConfig.endpoint_sdk} />
@@ -112,23 +111,25 @@
 					type="text"
 					class="input input-bordered w-full"
 					placeholder="Leave Empty if already saved in config"
-					bind:value={editingConfig.api_key}
+					bind:value={editingConfig.secret_key}
 				/>
 			</div>
 
 			<!-- Base URL Input -->
-			<div class="form-control">
-				<label class="label" for="base-url">
-					<span class="label-text">Base URL</span>
-				</label>
-				<input
-					name="base-url"
-					type="text"
-					class="input input-bordered w-full"
-					required
-					bind:value={editingConfig.base_url}
-				/>
-			</div>
+			{#if editingConfig.endpoint_sdk === LlmSdk.OpenAICompatible}
+				<div class="form-control">
+					<label class="label" for="base-url">
+						<span class="label-text">Base URL</span>
+					</label>
+					<input
+						name="base-url"
+						type="text"
+						class="input input-bordered w-full"
+						required
+						bind:value={editingConfig.base_url}
+					/>
+				</div>
+			{/if}
 
 			<!-- Models Input -->
 			<div class="form-control mt-4">
@@ -142,16 +143,16 @@
 					</span>
 				</div>
 				<ul class="form-control gap-1">
-					{#each editingConfig.models as model, index}
+					{#each editingConfig.models ?? [] as _, index}
 						<li class="flex flex-row">
-							<label class="label min-w-fit" for="model">
+							<label class="label min-w-fit" for={`models-${index}`}>
 								<span class="label-text">Model Name</span>
 							</label>
 							<input
-								name="models"
+								name={`models-${index}`}
 								type="text"
 								class="input input-bordered w-full"
-								bind:value={editingConfig.models[index]}
+								bind:value={editingConfig.models![index]}
 							/>
 						</li>
 					{/each}
@@ -159,7 +160,7 @@
 				<button
 					type="button"
 					class="btn_emerald my-1 w-fit"
-					onclick={() => editingConfig.models.push('')}>Add Model</button
+					onclick={() => editingConfig.models?.push('')}>Add Model</button
 				>
 			</div>
 

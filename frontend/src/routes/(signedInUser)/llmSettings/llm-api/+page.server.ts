@@ -1,13 +1,15 @@
+import type { LlmSdk } from '../state.svelte';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
 	saveApiConfig: async ({ request, fetch }) => {
 		const formData = await request.formData();
-		const apiConfig: LLMApiConfig = {
+		const apiConfig: ApiConfig = {
+			id: '',
 			name: formData.get('name') as string,
 			endpoint_sdk: formData.get('endpoint-sdk') as LlmSdk,
 			base_url: formData.get('base-url') as string,
-			api_key: formData.get('api-key') as string,
+			secret_key: formData.get('api-key') as string,
 			models: formData.getAll('models') as string[]
 		};
 

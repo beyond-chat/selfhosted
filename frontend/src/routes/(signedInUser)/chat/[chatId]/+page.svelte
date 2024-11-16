@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { marked } from 'marked';
-	import { chatState } from './chat.svelte';
+	import { chatState } from './state.svelte';
 	import { tick } from 'svelte';
 	import { esClose_SaveDb } from './chatResponse';
 

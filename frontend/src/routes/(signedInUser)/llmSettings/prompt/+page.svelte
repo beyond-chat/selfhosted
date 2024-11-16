@@ -2,9 +2,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { onMount } from 'svelte';
+	import { llmState } from '../state.svelte';
 
-	let { data } = $props();
-	let { llmSavedSettings }: { llmSavedSettings: LLMSavedSettings } = $derived(data);
 	let emptyconfig: PromptConfig = { name: '', max_tokens: 0, temperature: 0, system_prompt: '' };
 	let editingConfig: PromptConfig = $state(emptyconfig);
 	let promptEditModal: HTMLDialogElement;
@@ -22,7 +21,7 @@
 			Add New Prompt Configuration
 		</button>
 	</div>
-	{#each llmSavedSettings.promptConfigs as config}
+	{#each llmState.settings.promptConfigs as config}
 		<div class="flex items-center justify-between border-b p-2 last:border-b-0">
 			<!-- last:border-b-0 to remove border from last element -->
 			<div class="flex-1">
@@ -63,7 +62,7 @@
 			<input
 				type="hidden"
 				name="promptConfigsLength"
-				value={llmSavedSettings.promptConfigs.length}
+				value={llmState.settings.promptConfigs.length}
 			/>
 
 			<!-- Name Input -->

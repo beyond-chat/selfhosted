@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use std::{io::Write, sync::OnceLock};
+
 pub static TOML_CONFIG_PATHS: OnceLock<Paths> = OnceLock::new();
 
 #[derive(Debug)]

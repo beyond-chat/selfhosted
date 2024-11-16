@@ -10,13 +10,10 @@ async fn main() -> Result<()> {
     telemetry::init_tracing();
 
     tracing::debug!("Initializing configuration");
-    let env_vars = init::EnvVarsConfig::new();
-    init::toml_data_paths()?;
+    init::config()?;
 
     tracing::debug!("Initializing db pool");
-    let db = Db::new(&env_vars.db_dsn, env_vars.db_pool_max_size)
-        .await
-        .context("Failed to initialize db pool")?;
+    let db = Db::new().await.context("Failed to initialize db pool")?;
     tracing::debug!("Running migrations");
     db.migrate().await.context("Failed to run migrations")?;
 

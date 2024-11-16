@@ -1,18 +1,18 @@
 use std::ops::Deref;
 
-use crate::{models::llm::ApiAndModelsConfig, utils::init::TOML_PATHS, Context, Result};
+use crate::{models::llm::ApiConfig, utils::init::TOML_PATHS, Context, Result};
 use axum::{http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct ApiConfigs {
-    configs: Vec<ApiAndModelsConfig>, // configs name need to match the toml array name
+    configs: Vec<ApiConfig>, // configs name need to match the toml array name
 }
 
 // Read all configurations and return them without exposing the API key
-pub async fn get_configs_handler() -> Result<Json<Vec<ApiAndModelsConfig>>> {
+pub async fn get_configs_handler() -> Result<Json<Vec<ApiConfig>>> {
     let toml = read_toml()?;
-    let configs: Vec<ApiAndModelsConfig> = toml
+    let configs: Vec<ApiConfig> = toml
         .configs
         .into_iter()
         .map(|config| config.without_api_key())
@@ -20,13 +20,13 @@ pub async fn get_configs_handler() -> Result<Json<Vec<ApiAndModelsConfig>>> {
     Ok(Json(configs))
 }
 
-pub fn get_configs_fn() -> Result<Vec<ApiAndModelsConfig>> {
+pub fn get_configs_fn() -> Result<Vec<ApiConfig>> {
     let toml_content = read_toml()?;
     Ok(toml_content.configs)
 }
 
 // Add a new API config
-pub async fn add_new_config(Json(config): Json<ApiAndModelsConfig>) -> Result<StatusCode> {
+pub async fn add_new_config(Json(config): Json<ApiConfig>) -> Result<StatusCode> {
     let mut toml = read_toml()?;
     toml.configs.push(config);
     save_toml(toml)?;
@@ -34,14 +34,19 @@ pub async fn add_new_config(Json(config): Json<ApiAndModelsConfig>) -> Result<St
 }
 
 // Update an existing API config
-pub async fn update_config(Json(config): Json<ApiAndModelsConfig>) -> Result<StatusCode> {
+pub async fn update_config(Json(config): Json<ApiConfig>) -> Result<StatusCode> {
     let mut toml = read_toml()?;
     let index = config.id as usize;
 
     let mut updated_config = config;
     // Retain the old API key if the new one is empty
-    if updated_config.api_key.as_deref().unwrap_or("").is_empty() {
-        updated_config.api_key = toml.configs[index].api_key.clone();
+    if updated_config
+        .secret_key
+        .as_deref()
+        .unwrap_or("")
+        .is_empty()
+    {
+        updated_config.secret_key = toml.configs[index].secret_key.clone();
     }
     toml.configs[index] = updated_config;
     save_toml(toml)?;

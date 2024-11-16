@@ -51,9 +51,9 @@ export const actions: Actions = {
 			throw new Error(await res.text());
 		}
 	},
-	saveSelectedApiPrompt: async ({ request, fetch }) => {
+	saveFavModel: async ({ request, fetch }) => {
 		const formData = await request.formData();
-		const selectedModelPrompt: FavModel = {
+		const selectedModelPrompt = {
 			id: Number(formData.get('selected_fav_model')),
 			api_id: Number(formData.get('selectedApiId')),
 			model: formData.get('selectedModel') as string,

@@ -8,9 +8,9 @@
 	import MdiStarOutline from '~icons/mdi/star-outline';
 	import MdiStar from '~icons/mdi/star';
 
-	import { sidebar } from '$/components/layout/sidebar.svelte';
+	import { sidebarState } from '$/components/layout/sidebar.svelte';
 	import { actions } from './topbarActions';
-	import { chatState } from './[chatId]/chat.svelte';
+	import { chatState } from './[chatId]/state.svelte';
 	import LlmControls from '../llmSettings/LlmControls.svelte';
 
 	let chatId = $derived($page.params.chatId);
@@ -21,17 +21,18 @@
 		chatState.title = chatTitle;
 	});
 
-	let { llmSavedSettings }: any = $props();
 	let isRenaming = $state(false);
 	// svelte-ignore non_reactive_update
 	let renameTextField: HTMLInputElement;
-	let llmControlsModal: HTMLDialogElement | undefined = $state();
 </script>
 
 <div class="flex items-center gap-6">
-	{#if !sidebar.isOpen}
+	{#if !sidebarState.isOpen}
 		<div class="tooltip tooltip-right mt-2" data-tip="Open Sidebar">
-			<button class="btn btn-square btn-ghost btn-sm" onclick={sidebar.toggle}>
+			<button
+				class="btn btn-square btn-ghost btn-sm"
+				onclick={() => sidebarState.toggle(localStorage)}
+			>
 				<TablerLayoutSidebarLeftExpandFilled class="h-9 w-9" />
 			</button>
 		</div>
@@ -105,5 +106,5 @@
 			</button>
 		</div>
 	{/if}
-	<LlmControls {llmSavedSettings} />
+	<LlmControls />
 </div>

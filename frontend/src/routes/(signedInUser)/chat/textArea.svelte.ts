@@ -1,53 +1,69 @@
-import { sidebar } from '$/components/layout/sidebar.svelte';
+import { sidebarState } from '$/components/layout/sidebar.svelte';
 import { goto } from '$app/navigation';
-import type { HistoryChatDetails } from '$lib/types/chat';
-import { chatState } from './[chatId]/chat.svelte';
-import { generateResponse } from './[chatId]/chatResponse';
+import { ChatCompletionStream } from 'openai/lib/ChatCompletionStream.mjs';
+import { chatState } from './[chatId]/state.svelte';
+import { generateResponse, type SseRequestBody } from './[chatId]/chatResponse';
+import { MessageStream } from '@anthropic-ai/sdk/lib/MessageStream.mjs';
+import { LlmSdk, llmState } from '../llmSettings/state.svelte';
 
-function createTextArea() {
-	let textAreaValue = $state('');
-	const favModels = [0, 1, 2, 3];
-	let activeFav: number = $state(0);
-
-	return {
-		get value() {
-			return textAreaValue;
-		},
-		set value(value) {
-			textAreaValue = value;
-		},
-		get favModels() {
-			return favModels;
-		},
-		get activeFav() {
-			return activeFav;
-		},
-		set activeFav(value) {
-			activeFav = value;
-		}
-	};
+class TextAreaState {
+	value = $state('');
 }
-export const textArea = createTextArea();
+export const textArea = new TextAreaState();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function submitQuery(chatId: any) {
+	const sseRequestBody: SseRequestBody = {
+		chatId: chatId,
+		query: textArea.value,
+		selected_fav_model_id: llmState.activeFav!.id
+	};
+	// New chat
 	if (chatId === 'new') {
-		const access_token = await (await fetch('/hooks_fetchHandler')).text();
-		const res = await fetch(`/axum-api/chat/new`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${access_token}`
-			},
-			body: JSON.stringify({ text: textArea.value })
-		});
-		if (res.ok) {
-			const { id, title }: HistoryChatDetails = await res.json();
-			chatId = id;
-			sidebar.addUnstarredChatToHistory({ id, title });
-			goto(`/chat/${chatId}`);
+		try {
+			sseRequestBody.isNewChat = true;
+			sseRequestBody.isTitleGenerating = true;
+			const res = await fetch('/chat/sse', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(sseRequestBody)
+			});
+			let title;
+			if (llmState.activeFav!.api.endpoint_sdk === LlmSdk.Anthropic) {
+				// @ts-expect-error ReadableStream on different environments can be strange
+				const runner = MessageStream.fromReadableStream(res.body);
+				title = await runner.finalText();
+			} else {
+				// @ts-expect-error ReadableStream on different environments can be strange
+				const runner = ChatCompletionStream.fromReadableStream(res.body);
+				title = await runner.finalContent();
+			}
+			// Save title to DB and get title from DB
+			const access_token = await (await fetch('/hooks_fetchHandler')).text();
+			const resId = await fetch(`/axum-api/chat/new`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain',
+					Authorization: `Bearer ${access_token}`
+				},
+				body: title
+			});
+			if (resId.ok) {
+				const { id, title }: HistoryChatDetails = await resId.json();
+				sseRequestBody.chatId = id;
+				sidebarState.addUnstarredChatToHistory({ id, title });
+				goto(`/chat/${id}`);
+			} else {
+				throw new Error(await resId.text());
+			}
+		} finally {
+			sseRequestBody.isTitleGenerating = false;
 		}
 	}
 	chatState.addQuery(textArea.value);
 	textArea.value = '';
-	generateResponse(chatState.qr[chatState.qr.length - 1].user_query, chatId);
+	// Generate response for both existing and new chat
+	generateResponse(sseRequestBody);
 }

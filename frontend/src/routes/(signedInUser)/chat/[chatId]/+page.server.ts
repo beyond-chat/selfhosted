@@ -1,4 +1,3 @@
-import type { Chat } from '$lib/types/chat';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, fetch }) => {

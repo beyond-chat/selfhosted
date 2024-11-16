@@ -1,30 +1,31 @@
 import type { UUID } from 'crypto';
 
-// Chat history
-type HistoryChatDetails = {
-	id: UUID;
-	title: string;
-};
-type UnstarredGroupedHistory = {
-	time_period: string;
-	period_chats: HistoryChatDetails[];
-};
-type ChatHistory = {
-	unstarred_history: UnstarredGroupedHistory[];
-	starred_history: HistoryChatDetails[];
-};
+declare global {
+	interface HistoryChatDetails {
+		id: UUID;
+		title: string;
+	}
+	interface UnstarredGroupedHistory {
+		time_period: string;
+		period_chats: HistoryChatDetails[];
+	}
+	interface ChatHistory {
+		unstarred_history: UnstarredGroupedHistory[];
+		starred_history: HistoryChatDetails[];
+	}
 
-// Each chat
-type ChatDetails = {
-	id: UUID;
-	title: string;
-	starred: boolean;
-};
-type ChatMessage = {
-	user_query: string;
-	assistant_response: string;
-};
-type Chat = {
-	details: ChatDetails;
-	messages: ChatMessage[];
-};
+	// Each chat
+	interface ChatDetails {
+		id: UUID;
+		title: string;
+		starred: boolean;
+	}
+	interface ChatMessage {
+		user_query: string;
+		assistant_response: string;
+	}
+	interface Chat {
+		details: ChatDetails;
+		messages: ChatMessage[];
+	}
+}

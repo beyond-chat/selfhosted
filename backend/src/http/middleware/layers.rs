@@ -3,6 +3,7 @@ use std::time::Duration;
 use axum::http::HeaderName;
 use hyper::Request;
 use tower_http::{
+    cors::{AllowHeaders, Any, CorsLayer},
     normalize_path::NormalizePathLayer,
     request_id::{MakeRequestId, PropagateRequestIdLayer, RequestId, SetRequestIdLayer},
     timeout::TimeoutLayer,
@@ -48,4 +49,12 @@ pub fn timeout() -> TimeoutLayer {
 /// will be changed to `/foo` before reaching the inner service.
 pub fn normalize_path() -> NormalizePathLayer {
     NormalizePathLayer::trim_trailing_slash()
+}
+
+pub fn cors() -> CorsLayer {
+    CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(AllowHeaders::mirror_request())
+        .max_age(Duration::from_secs(600))
 }

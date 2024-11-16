@@ -3,16 +3,21 @@
 	import { enhance } from '$app/forms';
 	import MdiClose from '~icons/mdi/close';
 	import FluentSettingsChat16Filled from '~icons/fluent/settings-chat-16-filled';
-	import { textArea } from '../chat/textArea.svelte';
-	let { llmSavedSettings }: { llmSavedSettings: LLMSavedSettings } = $props();
+	import { llmState } from './state.svelte';
+	// Dialog Element
 	let llmControlsModal: HTMLDialogElement;
-	let selectedApi: LLMApiConfig | undefined = $state();
+
+	// Form fields default values and bind values
+	let selectedApi: ApiConfig | undefined = $state();
 	let selectedModel: string | undefined = $state();
-	let selectedPromptConfig: PromptConfig | undefined = $state();
 	$effect(() => {
-		selectedModel = selectedApi?.models[0];
+		// Needed when selected Api is changed from dropdown
+		selectedModel = selectedApi?.models![0] ?? '';
 	});
-	let activeFav: number = $state(textArea.favModels[0]);
+	let selectedPromptConfig: PromptConfig | undefined = $state();
+
+	// Local activeFav for favModels Buttons inside the dialog
+	let activeFavId: number = $state(llmState.defaultFavModels[0]);
 </script>
 
 <div class="tooltip tooltip-left text-accent" data-tip="LLM Controls">
@@ -20,23 +25,16 @@
 		type="button"
 		class="btn btn-square btn-ghost btn-sm"
 		onclick={() => {
-			selectedApi = llmSavedSettings.llmApiModels.find(
-				(api) => api.id === llmSavedSettings.favModels[activeFav].api_id
-			);
-			selectedPromptConfig = llmSavedSettings.promptConfigs.find(
-				(prompt) => prompt.id === llmSavedSettings.favModels[activeFav].prompt_id
-			);
+			selectedApi = llmState.settings.apiConfigs[0] ?? '';
+			// selectedModel = selectedApi.models![0] ?? ''; //Not needed with $effect
+			selectedPromptConfig = llmState.settings.promptConfigs[0] ?? '';
 			llmControlsModal!.showModal();
 		}}
 	>
 		<FluentSettingsChat16Filled class="h-6 w-6" />
 	</button>
 </div>
-<dialog
-	bind:this={llmControlsModal}
-	class="modal"
-	onclose={() => (activeFav = textArea.favModels[0])}
->
+<dialog bind:this={llmControlsModal} class="modal">
 	<div class="modal-box">
 		<div class="flex items-center justify-between">
 			<h3 class="text-lg font-bold">LLM Controls</h3>
@@ -49,12 +47,15 @@
 		<div class="divider my-0"></div>
 		<form
 			method="POST"
-			action="/llmSettings/prompt?/saveSelectedApiPrompt"
-			use:enhance
-			onsubmit={() => {
-				textArea.activeFav = activeFav;
-				llmControlsModal.close();
+			action="/llmSettings/prompt?/saveFavModel"
+			use:enhance={() => {
+				return async ({ update }) => {
+					await update();
+					llmState.setActiveFavById(activeFavId);
+					activeFavId = llmState.defaultFavModels[0];
+				};
 			}}
+			onsubmit={() => llmControlsModal.close()}
 		>
 			<div class="flex flex-col gap-4">
 				<!-- API Selector -->
@@ -63,7 +64,7 @@
 						<span class="label-text">Select API Model:</span>
 					</div>
 					<select bind:value={selectedApi} class="select select-bordered">
-						{#each llmSavedSettings.llmApiModels as api}
+						{#each llmState.settings.apiConfigs as api}
 							<option value={api}>{api.name}</option>
 						{/each}
 					</select>
@@ -88,7 +89,7 @@
 						<span class="label-text">Select Prompt Engineered Config:</span>
 					</div>
 					<select bind:value={selectedPromptConfig} class="select select-bordered">
-						{#each llmSavedSettings.promptConfigs as config}
+						{#each llmState.settings.promptConfigs as config}
 							<option value={config}>{config.name}</option>
 						{/each}
 					</select>
@@ -127,17 +128,17 @@
 					save advanced/pricer(4o or o1) models as favorite.</span
 				>
 				<div class="join">
-					{#each textArea.favModels as value}
+					{#each llmState.defaultFavModels as value}
 						<button
 							type="button"
 							class="btn join-item btn-sm"
-							class:btn-active={activeFav === value}
-							onclick={() => (activeFav = value)}
+							class:btn-active={activeFavId === value}
+							onclick={() => (activeFavId = value)}
 						>
 							{value === 0 ? 'Default' : value}
 						</button>
 					{/each}
-					<input type="hidden" name="selected_fav_model" value={activeFav} />
+					<input type="hidden" name="selected_fav_model" value={activeFavId} />
 				</div>
 			</div>
 			<!-- Save Button -->

@@ -1,43 +1,28 @@
-import type { ChatHistory, HistoryChatDetails } from '$lib/types/chat';
-
-function createSidebar() {
-	let isOpen = $state(true);
-	let chatHistory: ChatHistory = $state({
+class GlobalSidebarState {
+	isOpen = $state(true);
+	chatHistory: ChatHistory = $state({
 		unstarred_history: [],
 		starred_history: []
 	});
-
-	function toggle() {
-		isOpen = !isOpen;
+	toggle(localStorage: Storage) {
+		this.isOpen = !this.isOpen;
+		localStorage.setItem('isSidebarOpen', this.isOpen.toString());
 	}
-	function initHistory(chats: ChatHistory) {
-		chatHistory = chats;
+	initHistory(chats: ChatHistory) {
+		this.chatHistory = chats;
 	}
-	function addUnstarredChatToHistory(chat: HistoryChatDetails) {
-		if (chatHistory.unstarred_history.length === 0) {
-			chatHistory.unstarred_history.push({
+	addUnstarredChatToHistory(chat: HistoryChatDetails) {
+		if (this.chatHistory.unstarred_history.length === 0) {
+			this.chatHistory.unstarred_history.push({
 				time_period: 'Recent',
 				period_chats: [chat]
 			});
 		} else {
-			chatHistory.unstarred_history[0].period_chats.unshift(chat);
+			this.chatHistory.unstarred_history[0].period_chats.unshift(chat);
 		}
 	}
-
-	return {
-		get isOpen() {
-			return isOpen;
-		},
-		toggle,
-		get chatHistory() {
-			return chatHistory;
-		},
-		initHistory,
-		addUnstarredChatToHistory
-	};
 }
-
-export const sidebar = createSidebar();
+export const sidebarState = new GlobalSidebarState();
 
 declare global {
 	interface Array<T> {

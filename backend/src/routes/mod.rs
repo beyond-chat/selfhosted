@@ -3,13 +3,10 @@ use axum::Router;
 use crate::http::AppState;
 
 mod chat;
-mod chat_sse;
 mod llm_settings;
 
 pub fn router_with_state() -> Router<AppState> {
-    Router::new()
-        .nest("/chat", chat::router())
-        .merge(chat_sse::router())
+    Router::new().nest("/chat", chat::router())
 }
 
 pub fn router() -> Router {

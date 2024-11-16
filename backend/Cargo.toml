@@ -7,12 +7,6 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.40.0", features = ["full"] }
-tokio-stream = "0.1.16"
-futures = "0.3.31"
-
-# LLM SDK
-async-openai = "0.25.0"
-anthropic-sdk = "0.1.5"
 
 # Http server and middleware
 axum = { version = "0.7.7", features = ["macros"] }

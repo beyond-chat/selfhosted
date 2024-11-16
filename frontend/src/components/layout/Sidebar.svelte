@@ -3,19 +3,22 @@
 	import MaterialSymbolsChatAddOn from '~icons/material-symbols/chat-add-on';
 
 	import ProfileDropdown from './ProfileDropdown.svelte';
-	import { sidebar } from './sidebar.svelte';
-	import type { ChatHistory } from '$lib/types/chat';
+	import { sidebarState } from './sidebar.svelte';
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 
 	let isChatPage = $derived($page.url.pathname.startsWith('/chat'));
 
 	let { chats }: { chats: ChatHistory } = $props();
 
 	// onMount(fetchChatHistory)
+	onMount(() => {
+		sidebarState.isOpen = localStorage.getItem('isSidebarOpen') === 'false' ? false : true;
+	});
 	let promise = $state(fetchChatHistory());
 	async function fetchChatHistory() {
-		if (sidebar.chatHistory.unstarred_history.length === 0) {
-			sidebar.initHistory(chats);
+		if (sidebarState.chatHistory.unstarred_history.length === 0) {
+			sidebarState.initHistory(chats);
 		}
 	}
 </script>
@@ -25,7 +28,10 @@
 		<a href="/" class="px-2 text-xl font-semibold">Beyond Chat</a>
 		{#if isChatPage}
 			<div class="tooltip tooltip-left" data-tip="Close Sidebar">
-				<button class="btn btn-square btn-ghost btn-sm" onclick={sidebar.toggle}>
+				<button
+					class="btn btn-square btn-ghost btn-sm"
+					onclick={() => sidebarState.toggle(localStorage)}
+				>
 					<F7ArrowLeftToLine class="h-6 w-6" />
 				</button>
 			</div>
@@ -41,12 +47,12 @@
 	{#await promise}
 		<!-- promise is pending -->
 		<p>Loading...</p>
-	{:then value}
+	{:then _}
 		<!-- promise was fulfilled -->
 		<div>
 			<p class="my-1 px-1 text-sm font-bold opacity-50">Starred Chats</p>
 			<ul class="max-h-[25vh] overflow-auto">
-				{#each sidebar.chatHistory.starred_history as chat}
+				{#each sidebarState.chatHistory.starred_history as chat}
 					<li class="truncate">
 						<a
 							href="/chat/{chat.id}"
@@ -58,7 +64,7 @@
 			</ul>
 		</div>
 		<ul class="flex-1 overflow-auto">
-			{#each sidebar.chatHistory.unstarred_history as period_group}
+			{#each sidebarState.chatHistory.unstarred_history as period_group}
 				<li class="my-1 px-1 text-sm font-bold opacity-40">{period_group.time_period}</li>
 				<ul>
 					{#each period_group.period_chats as chat}

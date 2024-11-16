@@ -9,7 +9,7 @@ pub use jwt::JWT;
 pub use routes::router;
 
 pub async fn middleware(req: Request, next: Next) -> Result<Response> {
-    let public_route = ["/auth/sign-in", "/auth/new-access-token", "/chat-sse"];
+    let public_route = ["/auth/sign-in", "/auth/new-access-token"];
     if public_route.contains(&req.uri().path()) {
         return Ok(next.run(req).await);
     }
