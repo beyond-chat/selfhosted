@@ -9,16 +9,16 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  axum-api:
-    uses: ./.github/workflows/axum-api.yml
+  # axum-api:
+  #   uses: ./.github/workflows/axum-api.yml
 
-  svelte-ui:
-    uses: ./.github/workflows/svelte-ui.yml
+  # svelte-ui:
+  #   uses: ./.github/workflows/svelte-ui.yml
 
   build:
-    needs:
-      - axum-api
-      - svelte-ui
+    # needs:
+    #   - axum-api
+    #   - svelte-ui
     runs-on: ubuntu-22.04
 
     environment: staging
@@ -36,6 +36,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
