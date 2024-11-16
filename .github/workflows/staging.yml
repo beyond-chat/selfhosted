@@ -35,7 +35,7 @@ jobs:
       # Download build artifacts
       - uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          name: sqlx_offline
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
