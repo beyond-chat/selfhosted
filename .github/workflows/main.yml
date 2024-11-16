@@ -1,4 +1,4 @@
-name: Staging - Publish Docker Image to GHCR
+name: Production - Publish Docker Image to GHCR
 
 on:
   pull_request:
@@ -51,11 +51,11 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # tags: |
+          tags: type=semver,pattern={{version}}
+          flavor: latest
           #   type=schedule
           #   type=ref,event=branch
           #   type=ref,event=pr
-          #   type=semver,pattern={{version}}
           #   type=semver,pattern={{major}}.{{minor}}
           #   type=semver,pattern={{major}}
           #   type=sha

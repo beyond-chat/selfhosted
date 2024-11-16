@@ -1,4 +1,4 @@
-name: Staging - Publish Docker Image to GHCR
+name: Staging
 
 on:
   pull_request:
