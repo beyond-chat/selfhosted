@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
     tracing::debug!("Running migrations");
     db.migrate().await.context("Failed to run migrations")?;
 
-    tracing::info!("Starting backend server on port 5000");
+    tracing::info!("Starting AXUM API server on port 5000");
     http::serve(db.pool).await;
 
     Ok(())

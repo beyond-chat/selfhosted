@@ -5,7 +5,7 @@ on:
 
 defaults:
   run:
-    working-directory: frontend
+    working-directory: svelte-ui
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: "pnpm"
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: svelte-ui/pnpm-lock.yaml
       # Step 4: Install dependencies
       - name: Install dependencies
         run: pnpm install
@@ -36,6 +36,6 @@ jobs:
         with:
           name: svelte_build_output
           path: |
-            frontend/build
-            frontend/package.json
-            frontend/node_modules
+            svelte-ui/build
+            svelte-ui/package.json
+            svelte-ui/node_modules

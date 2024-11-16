@@ -1,7 +1,6 @@
 name: Staging - Publish Docker Image to GHCR
 
 on:
-  push:
   pull_request:
     branches: [release]
 env:
@@ -9,16 +8,16 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # axum-api:
-  #   uses: ./.github/workflows/axum-api.yml
+  axum-api:
+    uses: ./.github/workflows/axum-api.yml
 
-  # svelte-ui:
-  #   uses: ./.github/workflows/svelte-ui.yml
+  svelte-ui:
+    uses: ./.github/workflows/svelte-ui.yml
 
   build:
-    # needs:
-    #   - axum-api
-    #   - svelte-ui
+    needs:
+      - axum-api
+      - svelte-ui
     runs-on: ubuntu-22.04
 
     environment: staging
@@ -35,9 +34,7 @@ jobs:
       # Download build artifacts
       - uses: actions/download-artifact@v4
         with:
-          name: sqlx_offline
-          run-id: 17
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -68,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker-context/Dockerfile
+          file: ./docker-infra/Dockerfile
           load: true
           push: true
           tags: ${{ steps.meta.outputs.tags }}

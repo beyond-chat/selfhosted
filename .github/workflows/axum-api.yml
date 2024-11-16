@@ -5,7 +5,7 @@ on:
 
 defaults:
   run:
-    working-directory: backend
+    working-directory: axum-api
 
 jobs:
   checks_and_setup:
@@ -38,7 +38,7 @@ jobs:
       - name: Sqlx Prepare Offline and Cache Migrations
         uses: ./.github/actions/sqlx
         with:
-          working-directory: backend
+          working-directory: axum-api
 
       - name: Run Rustfmt & Clippy # Check code formatting && Run Clippy and treat warnings as errors
         run: cargo fmt -- --check && cargo clippy --all-targets --all-features -- -D warnings
@@ -52,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sqlx_offline
-          path: backend/.sqlx
+          path: axum-api/.sqlx
           include-hidden-files: true
 
   build:
@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: sqlx_offline
-          path: backend/.sqlx
+          path: axum-api/.sqlx
 
       - name: Cargo Build Release
         run: cargo build --release
@@ -81,4 +81,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: axum_build_binary
-          path: backend/target/release/axum-api
+          path: axum-api/target/release/axum-api

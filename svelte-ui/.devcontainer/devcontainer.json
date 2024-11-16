@@ -1,5 +1,5 @@
 {
-	"name": "frontend-bc_sh",
+	"name": "svelte_ui-bc_sh",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
 	"runArgs": ["--env-file=.env", "--network=host"],
 	"containerEnv": {
