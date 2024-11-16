@@ -24,6 +24,7 @@ COPY ./docker-infra/nginx.conf /etc/nginx/nginx.conf
 # Copy supervisord config
 COPY ./docker-infra/supervisord.conf /etc/supervisord.conf
 
+
 ENV DATABASE_POOL_MAX_SIZE=5
 ENV JWT_SECRET="mysecretjwt"
 
