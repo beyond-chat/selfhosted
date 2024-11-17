@@ -11,24 +11,20 @@ jobs:
   # axum-api:
   #   uses: ./.github/workflows/axum-api.yml
 
-  svelte-ui:
-    uses: ./.github/workflows/svelte-ui.yml
-
-  build:
-    delete-package:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete all versions of package
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-        run: |
-          echo "Deleting package: ${{ env.IMAGE_NAME }}"
-          
-          # List and delete all versions
-          for version_id in $(gh api /user/packages/container/${{ env.IMAGE_NAME }}/versions --jq '.[].id'); do
-            echo "Deleting version: $version_id"
-            gh api \
-              --method DELETE \
-              /user/packages/container/${{ env.IMAGE_NAME }}/versions/$version_id
-          done
+  delete-package:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Delete all versions of package
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OWNER: ${{ github.repository_owner }}
+      run: |
+        echo "Deleting package: ${{ env.IMAGE_NAME }}"
+        
+        # List and delete all versions
+        for version_id in $(gh api /user/packages/container/${{ env.IMAGE_NAME }}/versions --jq '.[].id'); do
+          echo "Deleting version: $version_id"
+          gh api \
+            --method DELETE \
+            /user/packages/container/${{ env.IMAGE_NAME }}/versions/$version_id
+        done
