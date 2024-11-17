@@ -16,7 +16,7 @@ RUN chown -R 1000:1000 /app
 
 # Copy Start Script
 COPY ./docker-infra/docker_entrypoint.sh /etc/app/init.sh
-RUN chmod +x /etc/app/init.sh /app/axum-api
+# RUN chmod +x /etc/app/init.sh /app/axum-api
 
 # Copy nginx config
 COPY ./docker-infra/nginx.conf /etc/nginx/nginx.conf
