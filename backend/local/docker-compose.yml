@@ -1,0 +1,33 @@
+volumes:
+  postgres-data:
+  beyondchat-data:
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Mount volume to persist PostgreSQL data where chats are stored
+
+  beyond-chat:
+    image: ghcr.io/beyond-chat/selfhosted:main
+    environment:
+      # Dynamically create the DATABASE_URL using the variables
+      POSTGRES_DB_URL: postgres://myuser:mypassword@postgres:5432/mydatabase
+      APP_URL: http://10.10.10.161:80
+      # APP_URL: http://192.168.0.40
+      # APP_URL: http://localhost:3000
+      # APP_URL: http://my-beyondchat.site
+    volumes:
+      - beyondchat-data:/app/.data/llm # Mount volume to persist LLM data like API keys
+    container_name: beyond-chat
+    ports:
+      - '10.10.10.161:80:80'
+      # - '192.168.0.40:80'
+      # - '3000:80'
+      # - 'my-beyondchat.site:80:80'
+    depends_on:
+      - postgres
