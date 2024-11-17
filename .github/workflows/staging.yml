@@ -39,17 +39,18 @@ jobs:
             && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
             && sudo apt update \
             && sudo apt install gh -y
-      - name: Delete all versions of package
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OWNER: ${{ github.repository_owner }}
-        run: |
-          echo "Deleting package: ${{ env.IMAGE_NAME }}"
+        
+      # - name: Delete all versions of package
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     OWNER: ${{ github.repository_owner }}
+      #   run: |
+      #     echo "Deleting package: ${{ env.IMAGE_NAME }}"
           
-          # List and delete all versions
-          for version_id in $(gh api /user/packages/container/${{ env.IMAGE_NAME }}/versions --jq '.[].id'); do
-            echo "Deleting version: $version_id"
-            gh api \
-              --method DELETE \
-              /user/packages/container/${{ env.IMAGE_NAME }}/versions/$version_id
-          done
+      #     # List and delete all versions
+      #     for version_id in $(gh api /user/packages/container/${{ env.IMAGE_NAME }}/versions --jq '.[].id'); do
+      #       echo "Deleting version: $version_id"
+      #       gh api \
+      #         --method DELETE \
+      #         /user/packages/container/${{ env.IMAGE_NAME }}/versions/$version_id
+      #     done
