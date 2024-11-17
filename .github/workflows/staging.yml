@@ -52,7 +52,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
+            type=ref,event=pr
             type=semver,pattern={{version}}
       - run: echo ${{ steps.meta.outputs.tags }}
       - name: Build and Push Docker image
