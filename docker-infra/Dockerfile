@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Copy files
 COPY artifacts/svelte_build_output/ /app/ui/
-COPY artifacts/axum_build_binary/axum-api /app/
+# COPY artifacts/axum_build_binary/axum-api /app/
 
 # Change ownership of Working Directory to UID 1000
 RUN chown -R 1000:1000 /app
