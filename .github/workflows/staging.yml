@@ -51,14 +51,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # tags: |
-          #   type=schedule
-          #   type=ref,event=branch
-          #   type=ref,event=pr
-          #   type=semver,pattern={{version}}
-          #   type=semver,pattern={{major}}.{{minor}}
-          #   type=semver,pattern={{major}}
-          #   type=sha
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
       - run: echo ${{ steps.meta.outputs.tags }}
       - name: Build and Push Docker image
         id: push
@@ -77,6 +72,7 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Inspect
         run: |
