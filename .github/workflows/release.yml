@@ -5,18 +5,19 @@ on:
     types: [published]
 
 jobs:
-  runs-on: ubuntu-latest
-  permissions:
-    contents: write
+  create_tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-  steps:
-    -name: |
-      # Get release version (without 'v' prefix if it exists)
-      VERSION="${{ github.event.release.tag_name }}"
-      VERSION="${VERSION#v}"  # Remove 'v' prefix if it exists
-      
-      # Create and push tag
-      git tag -a "v${VERSION}" -m "Release version ${VERSION}"
-      git push origin "v${VERSION}"
-      
-      echo "Created tag v${VERSION}"
+    steps:
+      -name: |
+        # Get release version (without 'v' prefix if it exists)
+        VERSION="${{ github.event.release.tag_name }}"
+        VERSION="${VERSION#v}"  # Remove 'v' prefix if it exists
+        
+        # Create and push tag
+        git tag -a "v${VERSION}" -m "Release version ${VERSION}"
+        git push origin "v${VERSION}"
+        
+        echo "Created tag v${VERSION}"
