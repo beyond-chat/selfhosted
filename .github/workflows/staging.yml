@@ -37,7 +37,9 @@ jobs:
 
       - name: Output tag
         run: |
-          echo ${{ github.event.release.tag_name }}
+          BRANCH_NAME="${{ github.head_ref }}"
+          VERSION=${BRANCH_NAME#release/}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

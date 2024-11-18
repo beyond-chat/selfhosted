@@ -1,7 +1,7 @@
 name: Production - Publish Docker Image to GHCR
 
 on:
-  push:
+  # push:
   pull_request:
     branches: [main]
 env:
