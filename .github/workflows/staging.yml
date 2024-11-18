@@ -4,7 +4,6 @@ on:
   push:
   pull_request:
     branches: [release/*]
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -27,6 +26,9 @@ jobs:
     permissions:
       # For pushing to GHCR
       packages: write
+      # For attestation step
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +36,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: Output tag
-        run: |
-          BRANCH_NAME="${{ github.head_ref }}"
-          VERSION=${BRANCH_NAME#release/}
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -51,7 +47,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+          flavor: latest
 
+          #   type=schedule
+          #   type=ref,event=pr
+          #   type=semver,pattern={{version}}
+          #   type=semver,pattern={{major}}.{{minor}}
+          #   type=semver,pattern={{major}}
+          #   type=sha
+      - run: echo ${{ steps.meta.outputs.tags }}
       - name: Build and Push Docker image
         id: push
         uses: docker/build-push-action@v6
@@ -60,7 +71,8 @@ jobs:
           file: ./docker-infra/Dockerfile
           load: true
           push: true
-          tags: latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Inspect
         run: |
