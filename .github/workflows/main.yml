@@ -1,9 +1,9 @@
-name: Staging
+name: Production - Publish Docker Image to GHCR
 
 on:
+  push:
   pull_request:
-    branches: [release/*]
-
+    branches: [main]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -21,11 +21,14 @@ jobs:
       - svelte-ui
     runs-on: ubuntu-22.04
 
-    environment: staging
+    environment: production
 
     permissions:
       # For pushing to GHCR
       packages: write
+      # For attestation step
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +47,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=ref,event=branch,pattern={{version}}
+          flavor: latest
+          #   type=schedule
+          #   type=ref,event=branch
+          #   type=ref,event=pr
+          #   type=semver,pattern={{major}}.{{minor}}
+          #   type=semver,pattern={{major}}
+          #   type=sha
+      - run: echo ${{ steps.meta.outputs.tags }}
       - name: Build and Push Docker image
         id: push
         uses: docker/build-push-action@v6
@@ -52,7 +69,15 @@ jobs:
           file: ./docker-infra/Dockerfile
           load: true
           push: true
-          tags: latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
 
       - name: Inspect
         run: |
