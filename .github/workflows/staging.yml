@@ -6,18 +6,18 @@ on:
     branches: [release/*]
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}-staging
 
 jobs:
-  # axum-api:
-  #   uses: ./.github/workflows/axum-api.yml
+  axum-api:
+    uses: ./.github/workflows/axum-api.yml
 
   svelte-ui:
     uses: ./.github/workflows/svelte-ui.yml
 
   build:
     needs:
-      # - axum-api
+      - axum-api
       - svelte-ui
     runs-on: ubuntu-22.04
 
@@ -53,7 +53,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
+            type=ref,event=branch,prefix=,suffix=,pattern=release/(.*)
 
           #   type=schedule
           #   type=ref,event=pr
