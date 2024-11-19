@@ -1,6 +1,7 @@
 name: Staging
 
 on:
+  push:
   pull_request:
     branches: [release/*]
 env:
@@ -25,6 +26,9 @@ jobs:
     permissions:
       # For pushing to GHCR
       packages: write
+      # For attestation step
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -44,14 +48,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker-infra/Dockerfile
+          file: ./docker-context/Dockerfile
           load: true
           push: true
           tags: latest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           # labels: ${{ github.event.head_ref }}
 
       # - name: Inspect
