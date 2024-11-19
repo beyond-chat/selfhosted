@@ -17,7 +17,6 @@ jobs:
   build:
     needs:
       - axum-api
-      
       - svelte-ui
     runs-on: ubuntu-22.04
 
@@ -26,9 +25,6 @@ jobs:
     permissions:
       # For pushing to GHCR
       packages: write
-      # For attestation step
-      id-token: write
-      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +52,7 @@ jobs:
           load: true
           push: true
           tags: latest
-          description: ${{ github.event.head_ref }}
+          labels: ${{ github.event.head_ref }}
 
       - name: Inspect
         run: |
