@@ -52,7 +52,7 @@ jobs:
           load: true
           push: true
           tags: latest
-          labels: ${{ github.event.head_ref }}
+          # labels: ${{ github.event.head_ref }}
 
       - name: Inspect
         run: |
