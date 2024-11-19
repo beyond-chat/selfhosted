@@ -44,7 +44,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker image
-        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -52,6 +51,7 @@ jobs:
           load: true
           push: true
           tags: latest
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # labels: ${{ github.event.head_ref }}
 
       # - name: Inspect
